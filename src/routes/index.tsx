@@ -105,8 +105,8 @@ function OpenToBuild() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [image, setImage] = useState<HTMLImageElement | null>(null);
-  const [ringText, setRingText] = useState(ringTexts[0]);
-  const [ringColor, setRingColor] = useState(ringColors[0].value);
+  const [ringText, setRingText] = useState("#OPENTOBUILD");
+  const [ringColor, setRingColor] = useState("#FF2D78");
   const [isDragging, setIsDragging] = useState(false);
   const [fileName, setFileName] = useState("");
 
