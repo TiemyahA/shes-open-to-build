@@ -2,7 +2,7 @@
 
 ## Changes
 - Restore the profile preview’s previous default avatar exactly, while keeping the current ring styling and editor.
-- Expand the third action into a compact “The post” panel containing the supplied default LinkedIn text and a copy button with clear copied feedback.
+- Expand the second action into a compact “The post” panel containing the supplied default LinkedIn text and a copy button with clear copied feedback.
 - Add a three-stage ring journey showing #OPENTOBUILD, #BUILDING, and #IMADETHAT with their specified colours and timing labels.
 - Replace the closing area with the supplied application link and the “Built on Lovable…” line.
 

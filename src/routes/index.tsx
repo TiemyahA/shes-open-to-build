@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ArrowUpRight, Check, Copy, Download, Sparkles, Upload } from "lucide-react";
+import { ArrowUpRight, Download, Sparkles, Upload } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, type DragEvent } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -10,14 +10,6 @@ const ringColors = [
   { value: "#FF5FA0", label: "Bubblegum" },
   { value: "#B6178F", label: "Magenta" },
   { value: "#111111", label: "Black" },
-];
-
-const linkedInPost = "Changed my ring colour. Applied to SheBuilds on Lovable. 72 hours. 400 women. Coding ability: unchanged. Confidence: unreasonable. Only 13% of Lovable's users are women. Go pink, then go apply: https://lnkd.in/g-2D6RsK #OpenToBuild";
-
-const ringJourney = [
-  { text: "#OPENTOBUILD", color: "#FF2D78", timing: "Day 0 · applied" },
-  { text: "#BUILDING", color: "#B6178F", timing: "Hours 1–72" },
-  { text: "#IMADETHAT", color: "#111111", timing: "Hour 73" },
 ];
 
 export const Route = createFileRoute("/")({
@@ -134,15 +126,30 @@ function renderCanvas(
     const height = image.naturalHeight * scale;
     context.drawImage(image, (size - width) / 2, (size - height) / 2, width, height);
   } else {
-    context.fillStyle = "#f3e9ed";
+    context.fillStyle = "#f7eaf0";
     context.fillRect(0, 0, size, size);
-    context.fillStyle = "#d8bcc8";
+    context.fillStyle = "#1f1c21";
     context.beginPath();
-    context.arc(center, 275, 125, 0, Math.PI * 2);
+    context.arc(center, 283, 116, 0, Math.PI * 2);
     context.fill();
     context.beginPath();
-    context.ellipse(center, 690, 285, 300, 0, 0, Math.PI * 2);
+    context.ellipse(center, 692, 275, 300, 0, 0, Math.PI * 2);
     context.fill();
+
+    context.fillStyle = "#ff167d";
+    context.beginPath();
+    context.arc(center - 92, 210, 42, 0, Math.PI * 2);
+    context.fill();
+    context.beginPath();
+    context.arc(center + 108, 272, 25, 0, Math.PI * 2);
+    context.fill();
+
+    context.strokeStyle = "#f7eaf0";
+    context.lineWidth = 16;
+    context.lineCap = "round";
+    context.beginPath();
+    context.arc(center, 302, 45, Math.PI * 0.18, Math.PI * 0.82);
+    context.stroke();
   }
   context.restore();
 
@@ -155,28 +162,6 @@ function renderCanvas(
   context.restore();
 }
 
-function RingExample({ text, color, timing }: { text: string; color: string; timing: string }) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    if (canvasRef.current) renderCanvas(canvasRef.current, null, color, text);
-  }, [color, text]);
-
-  return (
-    <article className="text-center">
-      <canvas
-        ref={canvasRef}
-        width={1000}
-        height={1000}
-        className="mx-auto aspect-square w-full max-w-64 rounded-full bg-muted shadow-frame"
-        aria-label={`${text} ring example, ${timing}`}
-      />
-      <h3 className="mt-5 font-display text-lg font-bold text-foreground sm:text-xl">{text}</h3>
-      <p className="mt-1 text-xs font-extrabold uppercase text-muted-foreground">{timing}</p>
-    </article>
-  );
-}
-
 function OpenToBuild() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -185,7 +170,6 @@ function OpenToBuild() {
   const [ringColor, setRingColor] = useState("#FF2D78");
   const [isDragging, setIsDragging] = useState(false);
   const [fileName, setFileName] = useState("");
-  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (canvasRef.current) renderCanvas(canvasRef.current, image, ringColor, ringText);
@@ -216,23 +200,6 @@ function OpenToBuild() {
     link.download = "open-to-build-profile.png";
     link.href = canvas.toDataURL("image/png");
     link.click();
-  };
-
-  const copyPost = async () => {
-    try {
-      await navigator.clipboard.writeText(linkedInPost);
-    } catch {
-      const textarea = document.createElement("textarea");
-      textarea.value = linkedInPost;
-      textarea.style.position = "fixed";
-      textarea.style.opacity = "0";
-      document.body.appendChild(textarea);
-      textarea.select();
-      document.execCommand("copy");
-      textarea.remove();
-    }
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 2000);
   };
 
   return (
@@ -351,58 +318,25 @@ function OpenToBuild() {
         </div>
       </section>
 
-      <section className="bg-background px-5 py-12 lg:px-8 lg:py-16">
+      <section className="bg-background px-5 py-10 lg:px-8 lg:py-12">
         <div className="mx-auto max-w-7xl">
           <p className="text-xs font-extrabold uppercase text-primary">Then make it real</p>
-          <div className="mt-5 grid items-start gap-x-10 md:grid-cols-3">
-            <a href="https://lnkd.in/g-2D6RsK" target="_blank" rel="noreferrer" className="step-block">
-              <span className="step-number">01</span>
-              <div><h3>Apply to SheBuilds ↗</h3><p>No code needed. Let's build, girlies! ✨ 🔨 ✨</p></div>
-            </a>
-            <a href="https://www.linkedin.com/in/me/" target="_blank" rel="noreferrer" className="step-block">
-              <span className="step-number">02</span>
-              <div><h3>Update your LinkedIn ↗</h3><p>Download your new profile picture and put it live.</p></div>
-            </a>
-            <div>
-              <div className="step-block">
-                <span className="step-number">03</span>
-                <div><h3>Call on your tribe</h3><p>Share what you're building. Tag it #OpenToBuild.</p></div>
-              </div>
-              <div className="border border-border bg-card p-5 shadow-card">
-                <div className="flex items-center justify-between gap-4">
-                  <p className="text-xs font-extrabold uppercase text-primary">The post</p>
-                  <Button type="button" variant="outline" size="sm" onClick={copyPost} aria-live="polite">
-                    {copied ? <Check /> : <Copy />}
-                    {copied ? "Copied" : "Copy post"}
-                  </Button>
-                </div>
-                <p className="mt-4 text-sm leading-relaxed text-card-foreground">{linkedInPost}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="border-y border-border bg-secondary px-5 py-12 lg:px-8 lg:py-16">
-        <div className="mx-auto max-w-5xl">
-          <div className="mb-8 text-center">
-            <p className="text-xs font-extrabold uppercase text-primary">Wear the journey</p>
-            <h2 className="mt-2 font-display text-3xl font-bold text-foreground sm:text-4xl">Three rings. One build.</h2>
-          </div>
-          <div className="grid grid-cols-1 gap-10 sm:grid-cols-3 sm:gap-6">
-            {ringJourney.map((ring) => <RingExample key={ring.text} {...ring} />)}
-          </div>
-        </div>
-      </section>
-
-      <footer className="bg-foreground px-5 py-8 text-primary-foreground lg:px-8">
-        <div className="mx-auto flex max-w-7xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <a href="https://lnkd.in/g-2D6RsK" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-display text-lg font-bold transition-opacity hover:opacity-75">
-            Apply to SheBuilds <ArrowUpRight className="size-4" />
+          <div className="mt-5 grid gap-x-10 md:grid-cols-3">
+          <a href="https://shebuilds.lovable.app/" target="_blank" rel="noreferrer" className="step-block">
+            <span className="step-number">01</span>
+            <div><h3>Apply to SheBuilds ↗</h3><p>No code needed. Let's build, girlies! ✨ 🔨 ✨</p></div>
           </a>
-          <p className="max-w-lg text-sm leading-relaxed text-primary-foreground/70 sm:text-right">Built on Lovable in one sitting by someone who cannot code.</p>
+          <a href="https://www.linkedin.com/in/me/" target="_blank" rel="noreferrer" className="step-block">
+            <span className="step-number">02</span>
+            <div><h3>Update your LinkedIn ↗</h3><p>Download your new profile picture and put it live.</p></div>
+          </a>
+          <div className="step-block">
+            <span className="step-number">03</span>
+            <div><h3>Call on your tribe</h3><p>Share what you're building. Tag it #OpenToBuild.</p></div>
+          </div>
+          </div>
         </div>
-      </footer>
+      </section>
     </main>
   );
 }
