@@ -80,26 +80,26 @@ function drawSoftArc(
   const { red, green, blue } = hexToRgb(color);
   const start = Math.PI * 0.17;
   const end = Math.PI * 1.13;
-  const segments = 120;
+  const startStop = start / (Math.PI * 2);
+  const endStop = end / (Math.PI * 2);
+  const fadeLength = 0.035;
+  const gradient = context.createConicGradient(0, center, center);
+  gradient.addColorStop(0, `rgba(${red}, ${green}, ${blue}, 0)`);
+  gradient.addColorStop(startStop, `rgba(${red}, ${green}, ${blue}, 0)`);
+  gradient.addColorStop(startStop + fadeLength, `rgba(${red}, ${green}, ${blue}, 1)`);
+  gradient.addColorStop(endStop - fadeLength, `rgba(${red}, ${green}, ${blue}, 1)`);
+  gradient.addColorStop(endStop, `rgba(${red}, ${green}, ${blue}, 0)`);
+  gradient.addColorStop(1, `rgba(${red}, ${green}, ${blue}, 0)`);
 
   context.save();
   context.shadowColor = "rgba(17, 17, 17, 0.16)";
   context.shadowBlur = 14;
-  for (let index = 0; index < segments; index += 1) {
-    const progress = index / segments;
-    const fadeIn = Math.min(progress / 0.11, 1);
-    const fadeOut = Math.min((1 - progress) / 0.11, 1);
-    const edgeFade = Math.min(fadeIn, fadeOut);
-    const alpha = edgeFade * edgeFade * (3 - 2 * edgeFade);
-    const segmentStart = start + (end - start) * progress;
-    const segmentEnd = start + (end - start) * ((index + 1.35) / segments);
-    context.strokeStyle = `rgba(${red}, ${green}, ${blue}, ${alpha})`;
-    context.lineWidth = 70;
-    context.lineCap = "butt";
-    context.beginPath();
-    context.arc(center, center, radius, segmentStart, segmentEnd);
-    context.stroke();
-  }
+  context.strokeStyle = gradient;
+  context.lineWidth = 70;
+  context.lineCap = "butt";
+  context.beginPath();
+  context.arc(center, center, radius, start, end);
+  context.stroke();
   context.restore();
 }
 
