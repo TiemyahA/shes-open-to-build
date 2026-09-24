@@ -227,6 +227,7 @@ function OpenToBuild() {
             <h1 className="max-w-5xl font-display text-5xl font-bold leading-[.96] text-foreground sm:text-7xl lg:text-[6.4rem]">
               Change your<br />ring colour<span className="text-primary">.</span>
             </h1>
+            <p className="mt-5 font-display text-2xl font-bold text-primary sm:text-3xl">#OpenToBuild</p>
           </div>
           <p className="max-w-xl border-l-2 border-primary pl-5 text-base leading-relaxed text-muted-foreground lg:mb-2 lg:text-lg">
             Green means you're looking for a job. Pink means you're <strong className="text-foreground">(that girl)</strong> building one. Drop in your photo, download, make it your profile picture.
@@ -249,14 +250,6 @@ function OpenToBuild() {
                 className="relative aspect-square w-full rounded-full bg-muted shadow-frame"
                 aria-label={`Profile picture preview with ${ringText} ring`}
               />
-              {!image && (
-                <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                  <div className="mt-8 flex flex-col items-center text-center text-foreground/65">
-                    <ImagePlus className="mb-3 size-9" strokeWidth={1.6} />
-                    <span className="text-sm font-bold">Your photo goes here</span>
-                  </div>
-                </div>
-              )}
             </div>
             <p className="mt-6 text-center text-xs font-bold uppercase text-muted-foreground">Square PNG · Ready for LinkedIn</p>
           </div>
