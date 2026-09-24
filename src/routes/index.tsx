@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ArrowUpRight, Download, ImagePlus, Sparkles, Upload } from "lucide-react";
+import { ArrowUpRight, Download, Sparkles, Upload } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, type DragEvent } from "react";
 
 import { Button } from "@/components/ui/button";
