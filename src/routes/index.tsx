@@ -33,14 +33,14 @@ export const Route = createFileRoute("/")({
 });
 
 // Band geometry (LinkedIn #OpenToWork style), in degrees with 0° = 3 o'clock, clockwise.
-const BAND_WIDTH = 130; // 13% of the 1000px canvas
-const ARC_START = 40; // ≈ 4:30
-const ARC_END = 222; // ≈ 9:30
-const FADE_RIGHT = 22; // fade length at the lower-right end
-const FADE_LEFT = 40; // fade length at the upper-left end
+const BAND_WIDTH = 155; // 15.5% of the 1000px canvas, measured from LinkedIn's frame
+const ARC_START = 30; // ≈ 4 o'clock
+const ARC_END = 225; // ≈ 10:30
+const FADE_RIGHT = 32; // fade length at the lower-right end
+const FADE_LEFT = 48; // fade length at the upper-left end
 const TEXT_CENTER_DEG = 120; // lower-left, between 6 and 9 o'clock
-const TEXT_SIZE = 56;
-const TEXT_TRACKING = 0.97; // slightly tighter than natural spacing
+const TEXT_SIZE = 94;
+const TEXT_TRACKING = 1.04; // a touch of letter-spacing, like LinkedIn's
 
 function drawArcText(
   context: CanvasRenderingContext2D,
@@ -143,15 +143,26 @@ function renderCanvas(
     context.drawImage(image, (size - width) / 2, (size - height) / 2, width, height);
   } else {
     // Standard LinkedIn-style placeholder: neutral background, slate silhouette.
-    context.fillStyle = "#e9e5df";
+    // Proportions and colours sampled from LinkedIn's default avatar.
+    context.fillStyle = "#e7e3dd";
     context.fillRect(0, 0, size, size);
-    context.fillStyle = "#788fa8";
+    context.fillStyle = "#a1b3c6"; // shoulders
     context.beginPath();
-    context.arc(center, 410, 150, 0, Math.PI * 2);
+    context.arc(center, 1130, 500, 0, Math.PI * 2);
     context.fill();
+    context.fillStyle = "#7d8fa4"; // head
     context.beginPath();
-    context.ellipse(center, 900, 320, 300, 0, Math.PI, Math.PI * 2);
+    context.arc(center, 505, 255, 0, Math.PI * 2);
     context.fill();
+    context.save(); // darker overlap where the shoulders cross the head
+    context.beginPath();
+    context.arc(center, 505, 255, 0, Math.PI * 2);
+    context.clip();
+    context.fillStyle = "#5b6879";
+    context.beginPath();
+    context.arc(center, 1130, 500, 0, Math.PI * 2);
+    context.fill();
+    context.restore();
   }
   context.restore();
 
