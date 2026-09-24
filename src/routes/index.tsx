@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Download, ImagePlus, Linkedin, Sparkles, Upload } from "lucide-react";
+import { ArrowUpRight, Download, Sparkles, Upload } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, type DragEvent } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -126,15 +126,30 @@ function renderCanvas(
     const height = image.naturalHeight * scale;
     context.drawImage(image, (size - width) / 2, (size - height) / 2, width, height);
   } else {
-    context.fillStyle = "#f3e9ed";
+    context.fillStyle = "#f7eaf0";
     context.fillRect(0, 0, size, size);
-    context.fillStyle = "#d8bcc8";
+    context.fillStyle = "#1f1c21";
     context.beginPath();
-    context.arc(center, 275, 125, 0, Math.PI * 2);
+    context.arc(center, 283, 116, 0, Math.PI * 2);
     context.fill();
     context.beginPath();
-    context.ellipse(center, 690, 285, 300, 0, 0, Math.PI * 2);
+    context.ellipse(center, 692, 275, 300, 0, 0, Math.PI * 2);
     context.fill();
+
+    context.fillStyle = "#ff167d";
+    context.beginPath();
+    context.arc(center - 92, 210, 42, 0, Math.PI * 2);
+    context.fill();
+    context.beginPath();
+    context.arc(center + 108, 272, 25, 0, Math.PI * 2);
+    context.fill();
+
+    context.strokeStyle = "#f7eaf0";
+    context.lineWidth = 16;
+    context.lineCap = "round";
+    context.beginPath();
+    context.arc(center, 302, 45, Math.PI * 0.18, Math.PI * 0.82);
+    context.stroke();
   }
   context.restore();
 
@@ -189,37 +204,43 @@ function OpenToBuild() {
 
   return (
     <main className="min-h-screen overflow-hidden bg-background">
-      <header className="border-b border-border bg-background">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 lg:px-8">
-          <a href="#top" className="font-display text-xl text-foreground" aria-label="OpenToBuild home">
-            <span className="text-primary">#</span>OpenToBuild
+      <header className="bg-background">
+        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 lg:px-8">
+          <a href="#top" className="font-display text-lg font-bold text-foreground" aria-label="OpenToBuild home">
+            <span className="text-primary">#</span>OpenToBuild<span className="text-primary">.</span>
           </a>
           <a
             href="https://shebuilds.lovable.app/"
             target="_blank"
             rel="noreferrer"
-            className="text-sm font-bold text-foreground underline decoration-primary decoration-2 underline-offset-4"
+            className="flex items-center gap-1 text-xs font-extrabold uppercase text-foreground transition-colors hover:text-primary"
           >
-            SheBuilds ↗
+            SheBuilds <ArrowUpRight className="size-3.5" />
           </a>
         </div>
       </header>
 
-      <section id="top" className="border-b border-border px-5 py-12 sm:py-16 lg:px-8 lg:py-20">
-        <div className="mx-auto max-w-7xl">
-          <p className="mb-4 text-xs font-black uppercase text-primary">Made for women who make things</p>
-          <h1 className="max-w-5xl font-display text-5xl leading-none text-foreground sm:text-7xl lg:text-8xl">
-            Change your ring colour.
-            <span className="mt-2 block text-primary">#OpenToBuild</span>
-          </h1>
-          <p className="mt-6 max-w-3xl text-lg leading-relaxed text-muted-foreground sm:text-xl">
+      <section id="top" className="px-5 pb-12 pt-10 sm:pb-16 sm:pt-14 lg:px-8 lg:pb-20">
+        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[1.35fr_.65fr] lg:items-end">
+          <div>
+            <p className="mb-5 text-xs font-extrabold uppercase text-primary">Made for women who make things</p>
+            <h1 className="max-w-5xl font-display text-5xl font-bold leading-[.96] text-foreground sm:text-7xl lg:text-[6.4rem]">
+              Change your<br />ring colour<span className="text-primary">.</span>
+            </h1>
+            <p className="mt-5 font-display text-2xl font-bold text-primary sm:text-3xl">#OpenToBuild</p>
+          </div>
+          <p className="max-w-xl border-l-2 border-primary pl-5 text-base leading-relaxed text-muted-foreground lg:mb-2 lg:text-lg">
             Green means you're looking for a job. Pink means you're <strong className="text-foreground">(that girl)</strong> building one. Drop in your photo, download, make it your profile picture.
           </p>
         </div>
       </section>
 
-      <section className="px-5 py-10 lg:px-8 lg:py-16">
-        <div className="mx-auto grid max-w-7xl items-start gap-10 lg:grid-cols-[minmax(0,1.08fr)_minmax(370px,.92fr)] lg:gap-16">
+      <section className="border-y border-border bg-card px-5 py-10 lg:px-8 lg:py-16">
+        <div className="mx-auto mb-9 flex max-w-7xl items-end justify-between border-b border-border pb-5">
+          <div><span className="text-xs font-extrabold text-primary">01</span><h2 className="mt-1 font-display text-2xl font-bold sm:text-3xl">Make your mark.</h2></div>
+          <p className="hidden text-xs font-bold uppercase text-muted-foreground sm:block">Your photo stays on your device</p>
+        </div>
+        <div className="mx-auto grid max-w-7xl items-start gap-10 lg:grid-cols-[minmax(0,1.12fr)_minmax(370px,.88fr)] lg:gap-20">
           <div className="lg:sticky lg:top-8">
             <div className="relative mx-auto aspect-square w-full max-w-[620px]">
               <canvas
@@ -229,24 +250,13 @@ function OpenToBuild() {
                 className="relative aspect-square w-full rounded-full bg-muted shadow-frame"
                 aria-label={`Profile picture preview with ${ringText} ring`}
               />
-              {!image && (
-                <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                  <div className="mt-8 flex flex-col items-center text-center text-foreground/65">
-                    <ImagePlus className="mb-3 size-9" strokeWidth={1.6} />
-                    <span className="text-sm font-bold">Your photo goes here</span>
-                  </div>
-                </div>
-              )}
             </div>
             <p className="mt-6 text-center text-xs font-bold uppercase text-muted-foreground">Square PNG · Ready for LinkedIn</p>
           </div>
 
           <div className="border border-border bg-card p-5 shadow-card sm:p-7">
             <div className="flex items-center justify-between border-b border-border pb-5">
-              <div>
-                <p className="text-xs font-black uppercase text-primary">Your profile picture</p>
-                <h2 className="mt-1 font-display text-3xl text-card-foreground">Make it yours.</h2>
-              </div>
+               <div><p className="text-xs font-extrabold uppercase text-primary">Profile studio</p><h3 className="mt-1 font-display text-2xl font-bold text-card-foreground">Make it yours.</h3></div>
               <Sparkles className="size-7 text-primary" aria-hidden="true" />
             </div>
 
@@ -308,22 +318,22 @@ function OpenToBuild() {
         </div>
       </section>
 
-      <section className="border-t border-foreground bg-foreground px-5 py-7 text-background lg:px-8">
-        <div className="mx-auto grid max-w-7xl gap-3 md:grid-cols-3">
+      <section className="bg-background px-5 py-10 lg:px-8 lg:py-12">
+        <div className="mx-auto max-w-7xl">
+          <p className="text-xs font-extrabold uppercase text-primary">Then make it real</p>
+          <div className="mt-5 grid gap-x-10 md:grid-cols-3">
           <a href="https://shebuilds.lovable.app/" target="_blank" rel="noreferrer" className="step-block">
             <span className="step-number">01</span>
-            <div><h3>Apply to SheBuilds</h3><p>No code needed. Let's build, girlies! ✨ 🔨 ✨</p></div>
-            <strong>Apply ↗</strong>
+            <div><h3>Apply to SheBuilds ↗</h3><p>No code needed. Let's build, girlies! ✨ 🔨 ✨</p></div>
           </a>
-          <div className="step-block bg-primary">
+          <a href="https://www.linkedin.com/in/me/" target="_blank" rel="noreferrer" className="step-block">
             <span className="step-number">02</span>
-            <div><h3>Generate & update</h3><p>Download, then update your LinkedIn photo.</p></div>
-            <a href="https://www.linkedin.com/in/me/" target="_blank" rel="noreferrer" aria-label="Open LinkedIn"><Linkedin className="size-4" /> LinkedIn ↗</a>
-          </div>
+            <div><h3>Update your LinkedIn ↗</h3><p>Download your new profile picture and put it live.</p></div>
+          </a>
           <div className="step-block">
             <span className="step-number">03</span>
-            <div><h3>Call on your tribe</h3><p>Share what you're building. Let's build!</p></div>
-            <strong>#OpenToBuild</strong>
+            <div><h3>Call on your tribe</h3><p>Share what you're building. Tag it #OpenToBuild.</p></div>
+          </div>
           </div>
         </div>
       </section>
