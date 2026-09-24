@@ -50,14 +50,15 @@ function drawArcText(
   let travelled = 0;
 
   letters.forEach((letter, index) => {
-    const characterCenter = travelled + widths[index] / 2;
+    const letterWidth = widths[index] ?? 0;
+    const characterCenter = travelled + letterWidth / 2;
     const angle = centerAngle + (textWidth / 2 - characterCenter) / radius;
     context.save();
     context.translate(center + Math.cos(angle) * radius, center + Math.sin(angle) * radius);
     context.rotate(angle - Math.PI / 2);
     context.fillText(letter, 0, 0);
     context.restore();
-    travelled += widths[index];
+    travelled += letterWidth;
   });
 }
 
