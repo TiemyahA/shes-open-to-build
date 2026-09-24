@@ -142,30 +142,16 @@ function renderCanvas(
     const height = image.naturalHeight * scale;
     context.drawImage(image, (size - width) / 2, (size - height) / 2, width, height);
   } else {
-    context.fillStyle = "#f7eaf0";
+    // Standard LinkedIn-style placeholder: neutral background, slate silhouette.
+    context.fillStyle = "#e9e5df";
     context.fillRect(0, 0, size, size);
-    context.fillStyle = "#1f1c21";
+    context.fillStyle = "#788fa8";
     context.beginPath();
-    context.arc(center, 283, 116, 0, Math.PI * 2);
+    context.arc(center, 410, 150, 0, Math.PI * 2);
     context.fill();
     context.beginPath();
-    context.ellipse(center, 692, 275, 300, 0, 0, Math.PI * 2);
+    context.ellipse(center, 900, 320, 300, 0, Math.PI, Math.PI * 2);
     context.fill();
-
-    context.fillStyle = "#ff167d";
-    context.beginPath();
-    context.arc(center - 92, 210, 42, 0, Math.PI * 2);
-    context.fill();
-    context.beginPath();
-    context.arc(center + 108, 272, 25, 0, Math.PI * 2);
-    context.fill();
-
-    context.strokeStyle = "#f7eaf0";
-    context.lineWidth = 16;
-    context.lineCap = "round";
-    context.beginPath();
-    context.arc(center, 302, 45, Math.PI * 0.18, Math.PI * 0.82);
-    context.stroke();
   }
   context.restore();
 
