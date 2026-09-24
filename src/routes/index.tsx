@@ -39,23 +39,26 @@ function drawArcText(
   radius: number,
 ) {
   const letters = [...text];
-  const fontSize = text.length > 16 ? 45 : 54;
-  context.font = `900 ${fontSize}px Arial, sans-serif`;
+  const fontSize = text.length > 16 ? 42 : 49;
+  context.font = `800 ${fontSize}px Arial, sans-serif`;
   context.fillStyle = "#ffffff";
   context.textAlign = "center";
   context.textBaseline = "middle";
-  const width = context.measureText(text).width;
-  const totalAngle = Math.min((width / radius) * 0.78, Math.PI * 0.64);
-  const letterAngle = totalAngle / letters.length;
-  const centerAngle = Math.PI * 0.65;
+  const widths = letters.map((letter) => context.measureText(letter).width);
+  const textWidth = widths.reduce((total, width) => total + width, 0);
+  const centerAngle = Math.PI * 0.69;
+  let travelled = 0;
 
   letters.forEach((letter, index) => {
-    const angle = centerAngle + totalAngle / 2 - letterAngle * (index + 0.5);
+    const letterWidth = widths[index] ?? 0;
+    const characterCenter = travelled + letterWidth / 2;
+    const angle = centerAngle + (textWidth / 2 - characterCenter) / radius;
     context.save();
     context.translate(center + Math.cos(angle) * radius, center + Math.sin(angle) * radius);
     context.rotate(angle - Math.PI / 2);
     context.fillText(letter, 0, 0);
     context.restore();
+    travelled += letterWidth;
   });
 }
 
@@ -75,34 +78,29 @@ function drawSoftArc(
   radius: number,
 ) {
   const { red, green, blue } = hexToRgb(color);
-  const start = Math.PI * 0.16;
-  const end = Math.PI * 1.18;
-  const segments = 72;
+  const start = Math.PI * 0.17;
+  const end = Math.PI * 1.13;
+  const startStop = start / (Math.PI * 2);
+  const endStop = end / (Math.PI * 2);
+  const fadeLength = 0.035;
+  const gradient = context.createConicGradient(0, center, center);
+  gradient.addColorStop(0, `rgba(${red}, ${green}, ${blue}, 0)`);
+  gradient.addColorStop(startStop, `rgba(${red}, ${green}, ${blue}, 0)`);
+  gradient.addColorStop(startStop + fadeLength, `rgba(${red}, ${green}, ${blue}, 1)`);
+  gradient.addColorStop(endStop - fadeLength, `rgba(${red}, ${green}, ${blue}, 1)`);
+  gradient.addColorStop(endStop, `rgba(${red}, ${green}, ${blue}, 0)`);
+  gradient.addColorStop(1, `rgba(${red}, ${green}, ${blue}, 0)`);
 
   context.save();
-  context.lineCap = "round";
-  context.lineWidth = 112;
-  context.filter = "blur(22px)";
-  context.strokeStyle = `rgba(${red}, ${green}, ${blue}, 0.28)`;
+  context.shadowColor = "rgba(17, 17, 17, 0.16)";
+  context.shadowBlur = 14;
+  context.strokeStyle = gradient;
+  context.lineWidth = 70;
+  context.lineCap = "butt";
   context.beginPath();
   context.arc(center, center, radius, start, end);
   context.stroke();
   context.restore();
-
-  for (let index = 0; index < segments; index += 1) {
-    const progress = index / segments;
-    const fadeIn = Math.min(progress / 0.2, 1);
-    const fadeOut = Math.min((1 - progress) / 0.18, 1);
-    const alpha = Math.min(fadeIn, fadeOut) * 0.96;
-    const segmentStart = start + (end - start) * progress;
-    const segmentEnd = start + (end - start) * ((index + 1.5) / segments);
-    context.strokeStyle = `rgba(${red}, ${green}, ${blue}, ${alpha})`;
-    context.lineWidth = 104;
-    context.lineCap = "round";
-    context.beginPath();
-    context.arc(center, center, radius, segmentStart, segmentEnd);
-    context.stroke();
-  }
 }
 
 function renderCanvas(
@@ -144,8 +142,8 @@ function renderCanvas(
   context.beginPath();
   context.arc(center, center, center, 0, Math.PI * 2);
   context.clip();
-  drawSoftArc(context, color, center, center - 54);
-  drawArcText(context, text, center, center - 62);
+  drawSoftArc(context, color, center, center - 35);
+  drawArcText(context, text, center, center - 40);
   context.restore();
 }
 
@@ -224,7 +222,6 @@ function OpenToBuild() {
         <div className="mx-auto grid max-w-7xl items-start gap-10 lg:grid-cols-[minmax(0,1.08fr)_minmax(370px,.92fr)] lg:gap-16">
           <div className="lg:sticky lg:top-8">
             <div className="relative mx-auto aspect-square w-full max-w-[620px]">
-              <div className="absolute -inset-3 rounded-full border border-dashed border-primary/40" aria-hidden="true" />
               <canvas
                 ref={canvasRef}
                 width={1000}
