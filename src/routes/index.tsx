@@ -140,8 +140,13 @@ function renderCanvas(
   }
   context.restore();
 
+  context.save();
+  context.beginPath();
+  context.arc(center, center, center, 0, Math.PI * 2);
+  context.clip();
   drawSoftArc(context, color, center, center - 54);
   drawArcText(context, text, center, center - 62);
+  context.restore();
 }
 
 function OpenToBuild() {
