@@ -32,6 +32,16 @@ export const Route = createFileRoute("/")({
   component: OpenToBuild,
 });
 
+// Band geometry (LinkedIn #OpenToWork style), in degrees with 0° = 3 o'clock, clockwise.
+const BAND_WIDTH = 130; // 13% of the 1000px canvas
+const ARC_START = 40; // ≈ 4:30
+const ARC_END = 222; // ≈ 9:30
+const FADE_RIGHT = 22; // fade length at the lower-right end
+const FADE_LEFT = 40; // fade length at the upper-left end
+const TEXT_CENTER_DEG = 120; // lower-left, between 6 and 9 o'clock
+const TEXT_SIZE = 56;
+const TEXT_TRACKING = 0.97; // slightly tighter than natural spacing
+
 function drawArcText(
   context: CanvasRenderingContext2D,
   text: string,
@@ -39,26 +49,24 @@ function drawArcText(
   radius: number,
 ) {
   const letters = [...text];
-  const fontSize = text.length > 16 ? 42 : 49;
-  context.font = `800 ${fontSize}px Arial, sans-serif`;
+  const fontSize = text.length > 12 ? Math.round(TEXT_SIZE * (12 / text.length)) : TEXT_SIZE;
+  context.font = `800 ${fontSize}px Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif`;
   context.fillStyle = "#ffffff";
   context.textAlign = "center";
   context.textBaseline = "middle";
-  const widths = letters.map((letter) => context.measureText(letter).width);
+  const widths = letters.map((letter) => context.measureText(letter).width * TEXT_TRACKING);
   const textWidth = widths.reduce((total, width) => total + width, 0);
-  const centerAngle = Math.PI * 0.69;
-  let travelled = 0;
+  let angle = (TEXT_CENTER_DEG * Math.PI) / 180 + textWidth / 2 / radius; // start at the upper-left end
 
   letters.forEach((letter, index) => {
     const letterWidth = widths[index] ?? 0;
-    const characterCenter = travelled + letterWidth / 2;
-    const angle = centerAngle + (textWidth / 2 - characterCenter) / radius;
+    const letterAngle = angle - letterWidth / 2 / radius;
     context.save();
-    context.translate(center + Math.cos(angle) * radius, center + Math.sin(angle) * radius);
-    context.rotate(angle - Math.PI / 2);
+    context.translate(center + Math.cos(letterAngle) * radius, center + Math.sin(letterAngle) * radius);
+    context.rotate(letterAngle - Math.PI / 2);
     context.fillText(letter, 0, 0);
     context.restore();
-    travelled += letterWidth;
+    angle -= letterWidth / radius;
   });
 }
 
@@ -75,32 +83,40 @@ function drawSoftArc(
   context: CanvasRenderingContext2D,
   color: string,
   center: number,
-  radius: number,
 ) {
   const { red, green, blue } = hexToRgb(color);
-  const start = Math.PI * 0.17;
-  const end = Math.PI * 1.13;
-  const startStop = start / (Math.PI * 2);
-  const endStop = end / (Math.PI * 2);
-  const fadeLength = 0.035;
-  const gradient = context.createConicGradient(0, center, center);
-  gradient.addColorStop(0, `rgba(${red}, ${green}, ${blue}, 0)`);
-  gradient.addColorStop(startStop, `rgba(${red}, ${green}, ${blue}, 0)`);
-  gradient.addColorStop(startStop + fadeLength, `rgba(${red}, ${green}, ${blue}, 1)`);
-  gradient.addColorStop(endStop - fadeLength, `rgba(${red}, ${green}, ${blue}, 1)`);
-  gradient.addColorStop(endStop, `rgba(${red}, ${green}, ${blue}, 0)`);
-  gradient.addColorStop(1, `rgba(${red}, ${green}, ${blue}, 0)`);
+  const size = center * 2;
+  const outer = center;
+  const inner = center - BAND_WIDTH;
+  const frame = context.getImageData(0, 0, size, size);
+  const pixels = frame.data;
 
-  context.save();
-  context.shadowColor = "rgba(17, 17, 17, 0.16)";
-  context.shadowBlur = 14;
-  context.strokeStyle = gradient;
-  context.lineWidth = 70;
-  context.lineCap = "butt";
-  context.beginPath();
-  context.arc(center, center, radius, start, end);
-  context.stroke();
-  context.restore();
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const dx = x + 0.5 - center;
+      const dy = y + 0.5 - center;
+      const distance = Math.hypot(dx, dy);
+      if (distance > outer || distance < inner - 1) continue;
+
+      let angle = (Math.atan2(dy, dx) * 180) / Math.PI;
+      if (angle < -90) angle += 360; // -90..270, continuous through the bottom and left
+      if (angle < ARC_START || angle > ARC_END) continue;
+
+      let fade = 1;
+      if (angle < ARC_START + FADE_RIGHT) fade = (angle - ARC_START) / FADE_RIGHT;
+      else if (angle > ARC_END - FADE_LEFT) fade = (ARC_END - angle) / FADE_LEFT;
+
+      const edge = Math.max(0, Math.min(1, Math.min(outer - distance, distance - inner) + 0.5));
+      const alpha = fade * edge;
+      const i = (y * size + x) * 4;
+      pixels[i] = (pixels[i] ?? 0) * (1 - alpha) + red * alpha;
+      pixels[i + 1] = (pixels[i + 1] ?? 0) * (1 - alpha) + green * alpha;
+      pixels[i + 2] = (pixels[i + 2] ?? 0) * (1 - alpha) + blue * alpha;
+      pixels[i + 3] = Math.max(pixels[i + 3] ?? 0, alpha * 255);
+    }
+  }
+
+  context.putImageData(frame, 0, 0);
 }
 
 function renderCanvas(
@@ -153,13 +169,8 @@ function renderCanvas(
   }
   context.restore();
 
-  context.save();
-  context.beginPath();
-  context.arc(center, center, center, 0, Math.PI * 2);
-  context.clip();
-  drawSoftArc(context, color, center, center - 35);
-  drawArcText(context, text, center, center - 40);
-  context.restore();
+  drawSoftArc(context, color, center);
+  drawArcText(context, text, center, center - BAND_WIDTH / 2);
 }
 
 function OpenToBuild() {
