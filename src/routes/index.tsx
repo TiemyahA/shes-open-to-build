@@ -39,23 +39,70 @@ function drawArcText(
   radius: number,
 ) {
   const letters = [...text];
-  const fontSize = text.length > 16 ? 47 : 58;
+  const fontSize = text.length > 16 ? 45 : 54;
   context.font = `900 ${fontSize}px Arial, sans-serif`;
   context.fillStyle = "#ffffff";
   context.textAlign = "center";
   context.textBaseline = "middle";
   const width = context.measureText(text).width;
-  const totalAngle = Math.min(width / radius, Math.PI * 0.78);
+  const totalAngle = Math.min((width / radius) * 0.78, Math.PI * 0.64);
   const letterAngle = totalAngle / letters.length;
+  const centerAngle = Math.PI * 0.65;
 
   letters.forEach((letter, index) => {
-    const angle = Math.PI / 2 + totalAngle / 2 - letterAngle * (index + 0.5);
+    const angle = centerAngle + totalAngle / 2 - letterAngle * (index + 0.5);
     context.save();
     context.translate(center + Math.cos(angle) * radius, center + Math.sin(angle) * radius);
     context.rotate(angle - Math.PI / 2);
     context.fillText(letter, 0, 0);
     context.restore();
   });
+}
+
+function hexToRgb(hex: string) {
+  const value = hex.replace("#", "");
+  return {
+    red: Number.parseInt(value.slice(0, 2), 16),
+    green: Number.parseInt(value.slice(2, 4), 16),
+    blue: Number.parseInt(value.slice(4, 6), 16),
+  };
+}
+
+function drawSoftArc(
+  context: CanvasRenderingContext2D,
+  color: string,
+  center: number,
+  radius: number,
+) {
+  const { red, green, blue } = hexToRgb(color);
+  const start = Math.PI * 0.16;
+  const end = Math.PI * 1.18;
+  const segments = 72;
+
+  context.save();
+  context.lineCap = "round";
+  context.lineWidth = 112;
+  context.filter = "blur(22px)";
+  context.strokeStyle = `rgba(${red}, ${green}, ${blue}, 0.28)`;
+  context.beginPath();
+  context.arc(center, center, radius, start, end);
+  context.stroke();
+  context.restore();
+
+  for (let index = 0; index < segments; index += 1) {
+    const progress = index / segments;
+    const fadeIn = Math.min(progress / 0.2, 1);
+    const fadeOut = Math.min((1 - progress) / 0.18, 1);
+    const alpha = Math.min(fadeIn, fadeOut) * 0.96;
+    const segmentStart = start + (end - start) * progress;
+    const segmentEnd = start + (end - start) * ((index + 1.5) / segments);
+    context.strokeStyle = `rgba(${red}, ${green}, ${blue}, ${alpha})`;
+    context.lineWidth = 104;
+    context.lineCap = "round";
+    context.beginPath();
+    context.arc(center, center, radius, segmentStart, segmentEnd);
+    context.stroke();
+  }
 }
 
 function renderCanvas(
@@ -93,12 +140,13 @@ function renderCanvas(
   }
   context.restore();
 
-  context.strokeStyle = color;
-  context.lineWidth = 128;
+  context.save();
   context.beginPath();
-  context.arc(center, center, center - 64, 0, Math.PI * 2);
-  context.stroke();
-  drawArcText(context, text, center, center - 68);
+  context.arc(center, center, center, 0, Math.PI * 2);
+  context.clip();
+  drawSoftArc(context, color, center, center - 54);
+  drawArcText(context, text, center, center - 62);
+  context.restore();
 }
 
 function OpenToBuild() {
@@ -263,24 +311,21 @@ function OpenToBuild() {
         </div>
       </section>
 
-      <section className="border-t border-foreground bg-foreground text-background">
-        <div className="mx-auto grid max-w-7xl divide-y divide-background/20 lg:grid-cols-3 lg:divide-x lg:divide-y-0">
+      <section className="border-t border-foreground bg-foreground px-5 py-7 text-background lg:px-8">
+        <div className="mx-auto grid max-w-7xl gap-3 md:grid-cols-3">
           <a href="https://shebuilds.lovable.app/" target="_blank" rel="noreferrer" className="step-block">
             <span className="step-number">01</span>
-            <h3>Apply to SheBuilds.</h3>
-            <p>You don't need to know how to code. Let's just build, girlies! ✨ 🔨 ✨</p>
-            <strong>Apply now ↗</strong>
+            <div><h3>Apply to SheBuilds</h3><p>No code needed. Let's build, girlies! ✨ 🔨 ✨</p></div>
+            <strong>Apply ↗</strong>
           </a>
           <div className="step-block bg-primary">
             <span className="step-number">02</span>
-            <h3>Generate & update.</h3>
-            <p>Make your #OpenToBuild picture here, then update your LinkedIn profile.</p>
-            <a href="https://www.linkedin.com/in/me/" target="_blank" rel="noreferrer"><Linkedin className="size-4" /> Open LinkedIn ↗</a>
+            <div><h3>Generate & update</h3><p>Download, then update your LinkedIn photo.</p></div>
+            <a href="https://www.linkedin.com/in/me/" target="_blank" rel="noreferrer" aria-label="Open LinkedIn"><Linkedin className="size-4" /> LinkedIn ↗</a>
           </div>
           <div className="step-block">
             <span className="step-number">03</span>
-            <h3>Call on your tribe.</h3>
-            <p>Share what you're building, find your people, and let's build!</p>
+            <div><h3>Call on your tribe</h3><p>Share what you're building. Let's build!</p></div>
             <strong>#OpenToBuild</strong>
           </div>
         </div>
