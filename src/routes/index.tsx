@@ -3,6 +3,7 @@ import { ArrowUpRight, Download, Sparkles, Upload } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, type DragEvent } from "react";
 
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 
 const ringTexts = ["#OPENTOBUILD", "#BUILDING", "#IMADETHAT", "#NOCODENOPROBLEM", "#WHUT"];
 const ringColors = [
@@ -179,6 +180,10 @@ function OpenToBuild() {
   const [isDragging, setIsDragging] = useState(false);
   const [fileName, setFileName] = useState("");
 
+  const trackActivity = useCallback((eventName: "photo_upload" | "ring_download") => {
+    void supabase.rpc("increment_activity_counter", { _event_name: eventName });
+  }, []);
+
   useEffect(() => {
     if (canvasRef.current) renderCanvas(canvasRef.current, image, ringColor, ringText);
   }, [image, ringColor, ringText]);
@@ -190,10 +195,11 @@ function OpenToBuild() {
     photo.onload = () => {
       setImage(photo);
       setFileName(file.name);
+      trackActivity("photo_upload");
       URL.revokeObjectURL(objectUrl);
     };
     photo.src = objectUrl;
-  }, []);
+  }, [trackActivity]);
 
   const handleDrop = (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -208,6 +214,7 @@ function OpenToBuild() {
     link.download = "open-to-build-profile.png";
     link.href = canvas.toDataURL("image/png");
     link.click();
+    trackActivity("ring_download");
   };
 
   return (
