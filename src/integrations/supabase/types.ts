@@ -14,13 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      activity_counters: {
+        Row: {
+          event_count: number
+          event_name: string
+          updated_at: string
+        }
+        Insert: {
+          event_count?: number
+          event_name: string
+          updated_at?: string
+        }
+        Update: {
+          event_count?: number
+          event_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      increment_activity_counter: {
+        Args: { _event_name: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

@@ -1,7 +1,4 @@
 # Roadmap
 
-- [ ] Restore the original default avatar.
-- [ ] Add “The post” card to action three with copy feedback.
-- [ ] Add the three-ring journey and updated footer.
-- [ ] Add anonymous counters for photo uploads and ring downloads.
-- [ ] Verify desktop, mobile, copying, uploads, downloads, and counters.
+- [x] Add anonymous counters for photo uploads and ring downloads only.
+- [x] Verify upload and download tracking without changing the page.
